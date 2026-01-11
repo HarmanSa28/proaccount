@@ -1,3 +1,12 @@
+exports.handler = async () => {
+  console.log("API FUNCTION ÇALIŞTI");
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ ok: true })
+  };
+};
+
 const { neon } = require('@neondatabase/serverless');
 
 console.log("DB URL:", process.env.NETLIFY_DATABASE_URL);
