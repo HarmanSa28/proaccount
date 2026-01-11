@@ -3,69 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProAccount v4</title>
+<title>ProAccount | Premium Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0f172a;
+  --panel: rgba(255,255,255,0.08);
+  --glass: rgba(255,255,255,0.15);
+  --primary: #38bdf8;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+}
+
+* { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top right, #1e293b, #020617);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ===== GİRİŞ ===== */
+#login-view {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  padding: 45px;
+  width: 380px;
+  border-radius: 18px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  animation: fadeUp 0.9s ease;
+}
+
+.login-card h1 {
+  margin: 0 0 10px;
+  font-weight: 900;
+  font-size: 32px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.login-card p {
+  color: var(--muted);
+  margin-bottom: 30px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  margin-bottom: 15px;
+  background: var(--glass);
+  color: white;
+  transition: 0.3s;
+}
+
+.login-card input:focus {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.login-card button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  background: linear-gradient(90deg, #38bdf8, #6366f1);
+  color: #020617;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(56,189,248,0.4);
+}
+
+/* ===== PANEL ===== */
+#app-view {
+  display: none;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+aside {
+  background: rgba(2,6,23,0.85);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+}
+
+aside h2 {
+  font-weight: 900;
+  margin-bottom: 40px;
+}
+
+.nav-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: 0.3s;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  background: var(--panel);
+  color: white;
+}
+
+/* MAIN */
+main {
+  padding: 40px;
+}
+
+header {
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  padding: 20px 30px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  animation: fadeDown 0.8s ease;
+}
+
+.card {
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  padding: 30px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  animation: fadeUp 0.8s ease;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 25px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat h3 {
+  font-size: 32px;
+  margin: 0;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* SÜRPRİZ 🎁 */
+#secret {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 12px;
+  opacity: 0.2;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#secret:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ANİMASYONLAR */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
+
 <body>
 
+<!-- LOGIN -->
 <div id="login-view">
-  <h2>ProAccount Login</h2>
-  <input id="log-user" placeholder="Kullanıcı Adı">
-  <input id="log-pass" type="password" placeholder="Şifre">
-  <button onclick="app.apiAction('LOGIN')">Giriş Yap</button>
+  <div class="login-card">
+    <h1>ProAccount</h1>
+    <p>Kurumsal Yönetim & Finans Paneli</p>
+    <input placeholder="Kullanıcı Adı">
+    <input type="password" placeholder="Şifre">
+    <button onclick="login()">Giriş Yap</button>
+  </div>
 </div>
 
-<div id="app-view" style="display:none">
-  <h2>Hoşgeldin <span id="user-tag"></span></h2>
-  <button onclick="location.reload()">Çıkış</button>
+<!-- APP -->
+<div id="app-view">
+  <div class="wrapper">
+    <aside>
+      <h2>Dashboard</h2>
+      <button class="nav-btn active">📊 Genel Bakış</button>
+      <button class="nav-btn">🛒 Satışlar</button>
+      <button class="nav-btn">📦 Stok</button>
+      <button class="nav-btn">👥 Cariler</button>
+      <button class="nav-btn">🛡 Admin</button>
+    </aside>
+
+    <main>
+      <header>
+        <div>Hoşgeldin, <strong>Admin</strong></div>
+        <button class="nav-btn">Çıkış</button>
+      </header>
+
+      <div class="grid">
+        <div class="card stat">
+          <h3>₺125.000</h3>
+          <span>Toplam Ciro</span>
+        </div>
+        <div class="card stat">
+          <h3>342</h3>
+          <span>Fatura</span>
+        </div>
+        <div class="card stat">
+          <h3>28</h3>
+          <span>Aktif Cari</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📈 Grafik Alanı (Yakında)</h3>
+        <p style="color:var(--muted)">Bu alan Chart.js ile canlanacak.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- SÜRPRİZ -->
+<div id="secret" onclick="alert('👀 Easter Egg yakaladın!')">
+  ProAccount v∞
 </div>
 
 <script>
-const app = {
-  user: null,
-
-  apiAction: async (action) => {
-    const payload = app.getPayload(action);
-
-    try {
-      const response = await fetch('/.netlify/functions/api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, payload })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || 'Hata oluştu');
-        return;
-      }
-
-      if (action === 'LOGIN') {
-        app.user = data;
-        app.initSession();
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert('Backend bağlantı hatası');
-    }
-  },
-
-  getPayload: (action) => {
-    if (action === 'LOGIN') {
-      return {
-        username: document.getElementById('log-user').value,
-        password: document.getElementById('log-pass').value
-      };
-    }
-  },
-
-  initSession: () => {
-    document.getElementById('login-view').style.display = 'none';
-    document.getElementById('app-view').style.display = 'block';
-    document.getElementById('user-tag').innerText = app.user.username;
-  }
-};
+function login(){
+  document.getElementById('login-view').style.display='none';
+  document.getElementById('app-view').style.display='block';
+}
 </script>
 
 </body>
