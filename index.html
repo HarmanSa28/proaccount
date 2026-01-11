@@ -1,316 +1,72 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProAccount v4 | Kurumsal Veritabanı Entegrasyonu</title>
-    <style>
-        :root {
-            --primary: #2563eb; --secondary: #64748b; --success: #22c55e;
-            --danger: #ef4444; --dark: #0f172a; --bg: #f8fafc; --border: #e2e8f0;
-        }
-
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--dark); overflow-x: hidden; }
-        .hidden { display: none !important; }
-        
-        /* GİRİŞ EKRANI */
-        #login-view {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
-        }
-        .login-card {
-            background: white; padding: 40px; border-radius: 16px; width: 380px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
-        }
-
-        /* PANEL YAPISI */
-        .wrapper { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
-        aside { background: var(--dark); color: white; padding: 25px; border-right: 1px solid var(--border); }
-        main { padding: 35px; overflow-y: auto; background: var(--bg); }
-        header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 30px; background: white; padding: 18px 25px; 
-            border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        /* KARTLAR */
-        .card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 25px; margin-bottom: 25px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        
-        /* FORM ELEMANLARI */
-        input, select { 
-            width: 100%; padding: 12px; margin: 10px 0; border: 1.5px solid var(--border); 
-            border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-
-        button { 
-            cursor: pointer; padding: 12px 24px; border-radius: 8px; font-weight: 600; 
-            border: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
-        }
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-nav { background: transparent; color: #94a3b8; text-align: left; justify-content: flex-start; margin-bottom: 8px; width: 100%; font-size: 15px; }
-        .btn-nav.active { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-
-        /* TABLOLAR */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        th { text-align: left; padding: 15px; background: #f8fafc; font-size: 13px; color: var(--secondary); border-bottom: 2px solid var(--border); text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        
-        .status-pill { padding: 5px 12px; border-radius: 30px; font-size: 11px; font-weight: 700; }
-        .pill-active { background: #dcfce7; color: #166534; }
-        .pill-banned { background: #fee2e2; color: #991b1b; }
-
-        /* FATURA MODAL */
-        #invoice-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9); display: none; overflow-y: auto; z-index: 1000;
-        }
-        .a4-page {
-            background: white; width: 210mm; min-height: 297mm; margin: 40px auto;
-            padding: 25mm; box-sizing: border-box; box-shadow: 0 0 60px rgba(0,0,0,0.5); position: relative;
-        }
-
-        @media print {
-            body * { visibility: hidden; }
-            .a4-page, .a4-page * { visibility: visible; }
-            .a4-page { position: absolute; left: 0; top: 0; margin: 0; box-shadow: none; width: 100%; }
-            .no-print { display: none !important; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProAccount v4</title>
 </head>
 <body>
 
-    <div id="login-view">
-        <div class="login-card">
-            <h1 style="color:var(--primary); margin:0;">ProAccount</h1>
-            <p style="color:var(--secondary); margin-bottom:30px;">Kurumsal Muhasebe Portalı</p>
-            <input type="text" id="log-user" placeholder="Kullanıcı Adı">
-            <input type="password" id="log-pass" placeholder="Şifre">
-            <button class="btn-primary" onclick="app.apiAction('LOGIN')">Sisteme Giriş Yap</button>
-        </div>
-    </div>
+<div id="login-view">
+  <h2>ProAccount Login</h2>
+  <input id="log-user" placeholder="Kullanıcı Adı">
+  <input id="log-pass" type="password" placeholder="Şifre">
+  <button onclick="app.apiAction('LOGIN')">Giriş Yap</button>
+</div>
 
-    <div id="app-view" class="hidden">
-        <div class="wrapper">
-            <aside>
-                <h2 style="margin-bottom:40px;">Yönetim Paneli</h2>
-                <nav>
-                    <button id="nav-sale" class="btn-nav active" onclick="app.showSection('sale')">🛒 Satış İşlemleri</button>
-                    <button id="nav-stock" class="btn-nav" onclick="app.showSection('stock')">📦 Stok & Cariler</button>
-                    <button id="nav-admin" class="btn-nav hidden" onclick="app.showSection('admin')">🛡️ Admin Denetimi</button>
-                </nav>
-            </aside>
+<div id="app-view" style="display:none">
+  <h2>Hoşgeldin <span id="user-tag"></span></h2>
+  <button onclick="location.reload()">Çıkış</button>
+</div>
 
-            <main>
-                <header>
-                    <div style="font-size: 16px;">Oturum: <strong id="user-tag"></strong></div>
-                    <button class="btn-danger" style="padding: 10px 20px;" onclick="location.reload()">Güvenli Çıkış</button>
-                </header>
+<script>
+const app = {
+  user: null,
 
-                <section id="sale-sec">
-                    <div class="card">
-                        <h3>Fatura Detayları</h3>
-                        <div class="grid">
-                            <select id="sel-cari"><option value="">Müşteri Seçin...</option></select>
-                            <div style="display:flex; gap:10px;">
-                                <select id="sel-prod"><option value="">Ürün Seçin...</option></select>
-                                <input type="number" id="in-qty" value="1" min="1" style="width:100px;">
-                            </div>
-                        </div>
-                        <button class="btn-primary" style="width:auto; margin-top:15px;" onclick="app.addToBasket()">+ Kalem Ekle</button>
-                    </div>
-                    <div class="card">
-                        <table>
-                            <thead><tr><th>Ürün</th><th>Miktar</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
-                            <tbody id="basket-body"></tbody>
-                        </table>
-                        <div style="text-align:right; margin-top:30px;">
-                            <h2 id="total-text" style="font-size:32px; margin:0;">0.00 TL</h2>
-                            <button class="btn-primary" style="background:var(--success); width:auto; margin-top:15px;" onclick="app.apiAction('SAVE_SALE')">Satışı Onayla ve Fatura Kes</button>
-                        </div>
-                    </div>
-                </section>
+  apiAction: async (action) => {
+    const payload = app.getPayload(action);
 
-                <section id="stock-sec" class="hidden">
-                    <div class="grid">
-                        <div class="card">
-                            <h3>Müşteri Kaydı (Cari)</h3>
-                            <input type="text" id="new-cari" placeholder="Şirket veya Şahıs Adı">
-                            <button class="btn-primary" onclick="app.apiAction('ADD_CARI')">Cariyi Sisteme İşle</button>
-                        </div>
-                        <div class="card">
-                            <h3>Envanter Kaydı (Stok)</h3>
-                            <input type="text" id="new-p-name" placeholder="Ürün Tanımı">
-                            <input type="number" id="new-p-price" placeholder="Birim Fiyat">
-                            <input type="number" id="new-p-stock" placeholder="Açılış Stoğu">
-                            <button class="btn-primary" onclick="app.apiAction('ADD_PRODUCT')">Stoğu Kaydet</button>
-                        </div>
-                    </div>
-                </section>
+    try {
+      const response = await fetch('/.netlify/functions/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, payload })
+      });
 
-                <section id="admin-sec" class="hidden">
-                    <div class="card">
-                        <h3>Kullanıcı Ekle</h3>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px;">
-                            <input type="text" id="adm-u" placeholder="Kullanıcı Adı">
-                            <input type="password" id="adm-p" placeholder="Şifre">
-                            <select id="adm-r"><option value="user">User</option><option value="admin">Admin</option></select>
-                            <button class="btn-primary" onclick="app.apiAction('CREATE_USER')">Ekle</button>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>Kullanıcı Yönetimi</h3>
-                        <table id="user-table">
-                            <thead><tr><th>Kullanıcı</th><th>Yetki</th><th>Durum</th><th>Eylem</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div class="card">
-                        <h3>Sistem Logları</h3>
-                        <table id="log-table" style="font-size:12px;">
-                            <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Eylem</th><th>Detay</th></tr></thead>
-                            <tbody id="log-table-body"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </main>
-        </div>
-    </div>
+      const data = await response.json();
 
-    <div id="invoice-modal">
-        <div class="a4-page">
-            <div style="display:flex; justify-content:space-between; border-bottom:4px solid var(--dark); padding-bottom:20px;">
-                <h1 id="f-header" style="margin:0; color:var(--primary);">PROACCOUNT TİC.</h1>
-                <div style="text-align:right"><h2>SATIŞ FATURASI</h2><p id="f-date"></p></div>
-            </div>
-            <div style="margin:40px 0;"><strong>SAYIN:</strong> <span id="f-cari" style="text-decoration:underline;"></span></div>
-            <table style="width:100%; border:1px solid #000;">
-                <thead style="background:#f1f5f9;"><tr><th>Açıklama</th><th>Adet</th><th>Fiyat</th><th>Toplam</th></tr></thead>
-                <tbody id="f-body"></tbody>
-            </table>
-            <div style="float:right; width:300px; margin-top:30px; border-top:2px solid #000; padding-top:10px;">
-                <h2 style="display:flex; justify-content:space-between;"><span>Genel Toplam:</span> <span id="f-total"></span></h2>
-            </div>
-            <div class="no-print" style="margin-top:100px; display:flex; gap:10px;">
-                <button class="btn-primary" onclick="window.print()">🖨️ Yazdır</button>
-                <button class="btn-danger" onclick="document.getElementById('invoice-modal').style.display='none'">Kapat</button>
-            </div>
-        </div>
-    </div>
+      if (!response.ok) {
+        alert(data.error || 'Hata oluştu');
+        return;
+      }
 
-    <script>
-        /**
-         * SQL VE API BAĞLANTILI ANA APP NESNESİ
-         */
-        const app = {
-            db: { users: [], products: [], cariler: [], logs: [] },
-            user: null, 
-            basket: [],
+      if (action === 'LOGIN') {
+        app.user = data;
+        app.initSession();
+      }
 
-            // TÜM DB İŞLEMLERİNİ TEK BİR MERKEZDEN YÖNETEN FONKSİYON
-            apiAction: async (action) => {
-                const payload = app.getPayload(action);
-                
-                // NOT: Gerçek bir sistemde burası fetch('/.netlify/functions/api') olacaktır.
-                // Şu an SQL'e veri gönderiyormuş gibi simüle ediyoruz ama mantık SQL hazır.
-                console.log(`SQL Tetiklendi: ${action}`, payload);
+    } catch (err) {
+      console.error(err);
+      alert('Backend bağlantı hatası');
+    }
+  },
 
-                if (action === 'LOGIN') {
-                    // SQL ÖRNEĞİ: SELECT * FROM users WHERE u = payload.u
-                    if(payload.u === 'admin' && payload.p === '1234') {
-                        app.user = {u: 'admin', r: 'admin'};
-                        app.initSession();
-                    } else { alert("Hatalı Giriş!"); }
-                }
+  getPayload: (action) => {
+    if (action === 'LOGIN') {
+      return {
+        username: document.getElementById('log-user').value,
+        password: document.getElementById('log-pass').value
+      };
+    }
+  },
 
-                if (action === 'SAVE_SALE') {
-                    // SQL ÖRNEĞİ: UPDATE products SET stock = stock - X... INSERT INTO logs...
-                    alert("Veritabanına Kaydedildi ve Stoklar Güncellendi!");
-                    app.logToDB("SATIŞ", `${payload.cari} adına fatura kesildi.`);
-                    app.generateInvoice(payload.cari);
-                }
+  initSession: () => {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'block';
+    document.getElementById('user-tag').innerText = app.user.username;
+  }
+};
+</script>
 
-                if (action === 'CREATE_USER' || action === 'ADD_PRODUCT' || action === 'ADD_CARI') {
-                    // SQL ÖRNEĞİ: INSERT INTO ...
-                    app.logToDB("VERİ_GİRİŞİ", `${action} işlemi yapıldı.`);
-                    alert("Kayıt Başarılı.");
-                    app.render();
-                }
-            },
-
-            // Formlardan veri toplama merkezi
-            getPayload: (action) => {
-                if(action === 'LOGIN') return {u: document.getElementById('log-user').value, p: document.getElementById('log-pass').value};
-                if(action === 'SAVE_SALE') return {cari: document.getElementById('sel-cari').value, basket: app.basket, user: app.user.u};
-                if(action === 'ADD_CARI') return {name: document.getElementById('new-cari').value};
-                if(action === 'ADD_PRODUCT') return {name: document.getElementById('new-p-name').value, price: document.getElementById('new-p-price').value, stock: document.getElementById('new-p-stock').value};
-                if(action === 'CREATE_USER') return {u: document.getElementById('adm-u').value, p: document.getElementById('adm-p').value, r: document.getElementById('adm-r').value};
-            },
-
-            // Logları SQL mantığıyla diziye/db'ye ekleme
-            logToDB: (type, msg) => {
-                app.db.logs.unshift({time: new Date().toLocaleString(), user: app.user.u, type, msg});
-                app.render();
-            },
-
-            initSession: () => {
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('hidden');
-                document.getElementById('user-tag').innerText = app.user.u.toUpperCase();
-                if(app.user.r === 'admin') document.getElementById('nav-admin').classList.remove('hidden');
-                app.render();
-            },
-
-            showSection: (s) => {
-                ['sale','stock','admin'].forEach(x => {
-                    document.getElementById(x+'-sec').classList.add('hidden');
-                    document.getElementById('nav-'+x).classList.remove('active');
-                });
-                document.getElementById(s+'-sec').classList.remove('hidden');
-                document.getElementById('nav-'+s).classList.add('active');
-            },
-
-            addToBasket: () => {
-                const pId = document.getElementById('sel-prod').value;
-                const qty = parseInt(document.getElementById('in-qty').value);
-                // Örnek ürün verisi (SQL'den gelecek)
-                app.basket.push({name: 'Örnek Ürün', qty, price: 500, total: qty * 500});
-                app.renderBasket();
-            },
-
-            generateInvoice: (cari) => {
-                document.getElementById('f-cari').innerText = cari;
-                document.getElementById('f-date').innerText = new Date().toLocaleDateString();
-                const tbody = document.getElementById('f-body');
-                tbody.innerHTML = '';
-                let total = 0;
-                app.basket.forEach(i => {
-                    total += i.total;
-                    tbody.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price} TL</td><td>${i.total} TL</td></tr>`;
-                });
-                document.getElementById('f-total').innerText = (total * 1.2).toFixed(2) + " TL";
-                document.getElementById('invoice-modal').style.display = 'block';
-            },
-
-            render: () => {
-                // Admin Log Tablosu
-                const lt = document.getElementById('log-table-body');
-                lt.innerHTML = '';
-                app.db.logs.forEach(l => {
-                    lt.innerHTML += `<tr><td>${l.time}</td><td>${l.user}</td><td>${l.type}</td><td>${l.msg}</td></tr>`;
-                });
-            },
-
-            renderBasket: () => {
-                const b = document.getElementById('basket-body');
-                b.innerHTML = '';
-                let t = 0;
-                app.basket.forEach(i => { t += i.total; b.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price}</td><td>${i.total}</td></tr>`; });
-                document.getElementById('total-text').innerText = (t * 1.2).toFixed(2) + " TL";
-            }
-        };
-    </script>
 </body>
 </html>
