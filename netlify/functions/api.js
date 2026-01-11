@@ -1,6 +1,9 @@
 const { neon } = require('@neondatabase/serverless');
 
+console.log("DB URL:", process.env.NETLIFY_DATABASE_URL);
+
 const sql = neon(process.env.NETLIFY_DATABASE_URL);
+
 
 exports.handler = async (event) => {
   try {
